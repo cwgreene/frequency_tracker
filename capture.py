@@ -73,10 +73,14 @@ def device_info(options):
 
 def main(args):
     parser = argparse.ArgumentParser()
-    parser.add_argument("--list", action="store_true")
-    parser.add_argument("--info", type=int)
-    parser.add_argument("--input-device-index", type=int)
-    parser.add_argument("--sample-rate", type=int)
+    parser.add_argument("--list", action="store_true",
+        help="list devices.")
+    parser.add_argument("--info", type=int,
+        help="get info on device with provided index.")
+    parser.add_argument("--input-device-index", type=int,
+        help="specify which device to use.")
+    parser.add_argument("--sample-rate", type=int,
+        help="specify the sample rate of the input device to use.")
     options = parser.parse_args(args)
     if options.list:
         list_devices()
