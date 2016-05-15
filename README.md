@@ -1,7 +1,14 @@
 # Frequency Tracking
 
-To test:
+## Setup:
+Install pyaudio (relies on portaudio)
 
+```
+brew install portaudio
+pip install pyaudio
+```
+
+## Testing
 Install sox, and run
 
 ```
