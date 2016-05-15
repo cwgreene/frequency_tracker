@@ -27,26 +27,28 @@ green = mkColor(colorama.Fore.GREEN)
 def track(options):
     audio = pyaudio.PyAudio()
     rate = options.sample_rate if options.sample_rate else RATE
+    buffers = options.buffers if options.buffers else BUFFERS
+    chunk = options.buffer_size if options.buffers_size else CHUNK
 
     stream = audio.open(format=pyaudio.paInt16,
             channels=CHANNELS,
             rate=rate,
             input=True,
             input_device_index=options.input_device_index,
-            frames_per_buffer=CHUNK)
+            frames_per_buffer=chunk)
 
-    for display in itertools.cycle(range(BUFFERS)):
-        data = stream.read(CHUNK)
+    for display in itertools.cycle(range(buffers)):
+        data = stream.read(chunk)
         data = numpy.fromstring(data, dtype=numpy.int16)
         if not display:
             a = data
         else:
             a = numpy.append(a, data)
-        if (display + 1) % BUFFERS == 0:
-            delta_t = (float(CHUNK)* BUFFERS)/rate
+        if (display + 1) % buffers == 0:
+            delta_t = (float(chunk)* buffers )/rate
             a = a - numpy.mean(a)
             fft = numpy.fft.fft(a)
-            fft[CHUNK/2:] = 0 # prevents alias from being detected
+            fft[chunk/2:] = 0 # prevents alias from being detected
             afft = numpy.abs(fft)
             amax = numpy.argmax(afft)
             print "%.3f %.3f (%.3f-%.3f)" % (amax/delta_t,
@@ -81,6 +83,10 @@ def main(args):
         help="specify which device to use.")
     parser.add_argument("--sample-rate", type=int,
         help="specify the sample rate of the input device to use.")
+    parser.add_argument("--buffers", type=int,
+        help="number of buffers to use in fft.")
+    parser.add_argument("--buffer-size", type=int,
+        help="size of sampling buffer.")
     options = parser.parse_args(args)
     if options.list:
         list_devices()
