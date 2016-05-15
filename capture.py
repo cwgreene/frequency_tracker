@@ -24,13 +24,15 @@ def mkColor(color):
 red = mkColor(colorama.Fore.RED)
 green = mkColor(colorama.Fore.GREEN)
 
-def track():
+def track(options):
     audio = pyaudio.PyAudio()
+    rate = options.sample_rate if options.sample_rate else RATE
 
     stream = audio.open(format=pyaudio.paInt16,
             channels=CHANNELS,
-            rate=RATE,
+            rate=rate,
             input=True,
+            input_device_index=options.input_device_index,
             frames_per_buffer=CHUNK)
 
     for display in itertools.cycle(range(BUFFERS)):
@@ -41,7 +43,7 @@ def track():
         else:
             a = numpy.append(a, data)
         if (display + 1) % BUFFERS == 0:
-            delta_t = (float(CHUNK)* BUFFERS)/RATE
+            delta_t = (float(CHUNK)* BUFFERS)/rate
             a = a - numpy.mean(a)
             fft = numpy.fft.fft(a)
             fft[CHUNK/2:] = 0 # prevents alias from being detected
@@ -62,17 +64,26 @@ def list_devices():
         device = p.get_device_info_by_index(i)
         isInput = True if device["maxInputChannels"] else False
         color = green if isInput else red
-        print device["name"], "isInput:", color(isInput)
+        print i, device["name"], "isInput:", color(isInput)
+
+def device_info(options):
+    p = pyaudio.PyAudio()
+    for key, val in p.get_device_info_by_index(options.info).items():
+        print key, val
 
 def main(args):
     parser = argparse.ArgumentParser()
-    parser.add_argument("--list", action="store_true");
+    parser.add_argument("--list", action="store_true")
+    parser.add_argument("--info", type=int)
+    parser.add_argument("--input-device-index", type=int)
+    parser.add_argument("--sample-rate", type=int)
     options = parser.parse_args(args)
-
     if options.list:
         list_devices()
+    elif options.info != None:
+        device_info(options)
     else:
-        track()
+        track(options)
 
 if __name__ == "__main__":
     main(sys.argv[1:])
