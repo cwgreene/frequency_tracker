@@ -36,7 +36,7 @@ def make_wave_file(options):
     output["right"] = samples
     if options.channel != "both":
         output[options.channel] = numpy.zeros(len(samples))
-    samples = interleave(output["left"], output["right"])
+    samples = interleave(output["right"], output["left"])
     samples = normalize(samples)
     wf.writeframes(samples)
 
