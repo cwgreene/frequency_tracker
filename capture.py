@@ -28,7 +28,7 @@ def track(options):
     audio = pyaudio.PyAudio()
     rate = options.sample_rate if options.sample_rate else RATE
     buffers = options.buffers if options.buffers else BUFFERS
-    chunk = options.buffer_size if options.buffers_size else CHUNK
+    chunk = options.buffer_size if options.buffer_size else CHUNK
 
     stream = audio.open(format=pyaudio.paInt16,
             channels=CHANNELS,
@@ -53,8 +53,8 @@ def track(options):
             amax = numpy.argmax(afft)
             print "%.3f %.3f (%.3f-%.3f)" % (amax/delta_t,
                 numpy.max(afft),
-                (amax-1)/delta_t,
-                (amax+1)/delta_t)
+                (amax - 1)/(2*delta_t),
+                (amax+1)/(2*delta_t))
 
     stream.stop_stream()
     stream.close()
