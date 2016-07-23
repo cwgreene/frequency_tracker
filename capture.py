@@ -51,10 +51,10 @@ def track(options):
             fft[chunk/2:] = 0 # prevents alias from being detected
             afft = numpy.abs(fft)
             amax = numpy.argmax(afft)
-            print "%.3f %.3f (%.3f-%.3f)" % (amax/delta_t,
+            print("%.3f %.3f (%.3f-%.3f)" % (amax/delta_t,
                 numpy.max(afft),
                 (amax - 1)/(2*delta_t),
-                (amax+1)/(2*delta_t))
+                (amax+1)/(2*delta_t)))
 
     stream.stop_stream()
     stream.close()
@@ -66,12 +66,12 @@ def list_devices():
         device = p.get_device_info_by_index(i)
         isInput = True if device["maxInputChannels"] else False
         color = green if isInput else red
-        print i, device["name"], "isInput:", color(isInput)
+        print(i, device["name"], "isInput:", color(isInput))
 
 def device_info(options):
     p = pyaudio.PyAudio()
     for key, val in p.get_device_info_by_index(options.info).items():
-        print key, val
+        print(key, val)
 
 def main(args):
     parser = argparse.ArgumentParser()
