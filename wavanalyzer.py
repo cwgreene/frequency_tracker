@@ -2,10 +2,12 @@ import argparse
 import sys
 import wave
 
-import numpy
+import numpy as np
 
-def uninterleave(data):
-    data = numpy.fromstring(data, dtype='int16')
+def read_data(data):
+    data = np.fromstring(data, dtype='int16')
+    data = data.astype('double')
+    data /= (2**15 - 1)
     return data.reshape((2,-1), order='F')
 
 def extract_sinusoid(t, frequency, data):
@@ -21,15 +23,22 @@ def extract_sinusoid(t, frequency, data):
 
 def read_wave(filename):
     wf = wave.open(filename, "r")
-    frames = wf.readframes(wf.getnframes())
-    return frames
+    nframes = wf.getnframes()
+    frames = wf.readframes(nframes)
+    frame_rate = wf.getframerate()
+    t = np.arange(0, nframes, dtype='double')/(frame_rate)
+    return frames, t
 
 def main(args):
     parser = argparse.ArgumentParser()
     parser.add_argument("filename")
+    parser.add_argument("--frequencies", nargs="*",
+        type=float, default=[660])
     options = parser.parse_args(args)
-    data = uninterleave(read_wave(options.filename))
-    print data
+    frames, t = read_wave(options.filename)
+    channels = read_data(frames)
+    for frequency in options.frequencies:
+        print frequency, extract_sinusoid(t, frequency, channels[0])
 
 if __name__ == "__main__":
     main(sys.argv[1:])
