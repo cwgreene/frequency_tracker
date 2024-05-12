@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import argparse
 import itertools
 import sys
@@ -48,7 +48,7 @@ def track(options):
             delta_t = (float(chunk)* buffers )/rate
             a = a - numpy.mean(a)
             fft = numpy.fft.fft(a)
-            fft[chunk/2:] = 0 # prevents alias from being detected
+            fft[chunk//2:] = 0 # prevents alias from being detected
             afft = numpy.abs(fft)
             amax = numpy.argmax(afft)
             print("%.3f %.3f (%.3f-%.3f)" % (amax/delta_t,
